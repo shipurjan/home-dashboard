@@ -1,6 +1,12 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { Area, AreaChart, LabelList, ResponsiveContainer } from 'recharts';
+import {
+  Area,
+  AreaChart,
+  LabelList,
+  ResponsiveContainer,
+  XAxis
+} from 'recharts';
 
 const data = [
   {
@@ -94,12 +100,12 @@ const data = [
   {
     name: '23',
     total: Math.floor(Math.random() * 10) - 5
-  },
-  {
-    name: '24',
-    total: Math.floor(Math.random() * 10) - 5
   }
-].map((e) => ({ ...e, total_deg: String(e.total) + '°C' }));
+].map((e) => ({
+  ...e,
+  total_deg: Math.random() > 0.5 ? '' : String(e.total) + '°C',
+  time: e.name + ':00'
+}));
 
 const gradientOffset = () => {
   const dataMax = Math.max(...data.map((i) => i.total));
@@ -134,7 +140,7 @@ export const WeatherForecast = ({
             <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset={off}
-                stopColor="hsl(var(--amber-600))"
+                stopColor="hsl(var(--green-600))"
                 stopOpacity={1}
               />
               <stop
@@ -144,12 +150,13 @@ export const WeatherForecast = ({
               />
             </linearGradient>
           </defs>
+          <XAxis dataKey={'time'} />
           <Area
             type="monotone"
             dataKey="total"
             stroke="hsl(var(--foreground))"
             fill="url(#splitColor)">
-            <LabelList dataKey="total" position="end" />
+            <LabelList dataKey="total_deg" position="end" />
           </Area>
         </AreaChart>
       </ResponsiveContainer>
