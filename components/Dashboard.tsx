@@ -23,11 +23,11 @@ export const Dashboard = () => {
       <div>
         <Card>
           <CardContent>
-            <Clock className="text-xl" interval={interval_ms} />
+            <Clock interval={interval_ms} />
           </CardContent>
         </Card>
       </div>
-      <Calendar selected={date} />
+      <Calendar fixedWeeks showOutsideDays selected={date} />
     </div>
   );
 };

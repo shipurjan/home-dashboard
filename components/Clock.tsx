@@ -26,17 +26,15 @@ export const Clock = ({ interval, className, ...props }: ClockProps) => {
               'flex flex-col items-center justify-center',
               className
             )}>
-            <div className="font-bold">
+            <h2>
               {time.split(':').map((timeChunk, idx) => (
                 <span key={idx}>
                   {idx !== 0 && <span className="animate-pulse-time">:</span>}
                   {timeChunk}
                 </span>
               ))}
-            </div>
-            <div style={{ fontSize: '0.667em' }} className=" font-medium">
-              {weekday}
-            </div>
+            </h2>
+            <h4>{weekday}</h4>
           </div>
         );
       }}
