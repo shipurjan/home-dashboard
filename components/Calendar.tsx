@@ -6,6 +6,13 @@ import ReactCalendar, {
 } from 'react-calendar';
 
 export type CalendarProps = ReactCalendarProps;
-export const Calendar = ({ value }: CalendarProps) => {
-  return <ReactCalendar locale="pl-PL" value={value} />;
+export const Calendar = ({ value, ...props }: CalendarProps) => {
+  return (
+    <ReactCalendar
+      locale="PL-pl"
+      className={'text-2xl'}
+      value={value}
+      {...props}
+    />
+  );
 };

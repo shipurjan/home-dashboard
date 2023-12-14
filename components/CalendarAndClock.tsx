@@ -8,7 +8,7 @@ export const CalendarAndClock = () => {
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    const interval = setInterval(() => setDate(new Date()), 1000);
+    const interval = setInterval(() => setDate(new Date()), 60000);
 
     return () => {
       clearInterval(interval);
@@ -16,7 +16,7 @@ export const CalendarAndClock = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center gap-8 p-24">
+    <div className="flex min-h-screen flex-col items-center justify-around gap-24 p-24">
       <Clock value={date} />
       <Calendar value={date} />
     </div>
