@@ -292,13 +292,13 @@
       --rose-900: 341.5 75.5% 30.4%;
       --rose-950: 343.1 87.7% 15.9%;
 
-      --background: var(--zinc-900);
+      --background: var(--zinc-950);
       --foreground: var(--zinc-50);
-      --card: var(--zinc-800);
+      --card: var(--zinc-900);
       --card-foreground: var(--indigo-50);
       --popover: 222.2 84% 4.9%;
       --popover-foreground: 210 40% 98%;
-      --primary: var(--indigo-600);
+      --primary: var(--indigo-700);
       --primary-foreground: var(--pink-50);
       --secondary: 217.2 32.6% 17.5%;
       --secondary-foreground: 210 40% 98%;
@@ -308,7 +308,7 @@
       --accent-foreground: 210 40% 98%;
       --destructive: 0 62.8% 30.6%;
       --destructive-foreground: 210 40% 98%;
-      --border: var(--zinc-700);
+      --border: var(--zinc-800);
       --input: 217.2 32.6% 17.5%;
       --ring: 224.3 76.3% 48%;
       --radius: 0.5rem;
