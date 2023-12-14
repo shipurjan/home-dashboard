@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar } from './Calendar';
+import { Calendar } from '@/components/ui/calendar';
 import { Clock } from './Clock';
 import 'moment/locale/pl';
+import { Card, CardContent } from '@/components/ui/card';
 
 export const Dashboard = () => {
   const [date, setDate] = useState(new Date());
@@ -18,11 +19,15 @@ export const Dashboard = () => {
   }, [interval_ms]);
 
   return (
-    <div className="flex min-h-screen min-w-full flex-col items-center justify-between">
-      <div className=" self-start">
-        <Clock interval={interval_ms} />
+    <div className="flex min-h-screen min-w-full flex-row gap-2 items-start p-2">
+      <div>
+        <Card>
+          <CardContent>
+            <Clock className="text-xl" interval={interval_ms} />
+          </CardContent>
+        </Card>
       </div>
-      <Calendar value={date} />
+      <Calendar selected={date} />
     </div>
   );
 };
