@@ -1,31 +1,38 @@
 'use client';
 
 import './Clock.css';
-import ReactClock, { ClockProps as ReactClockProps } from 'react-clock';
 import ReactLiveClock from 'react-live-clock';
 
-export type ClockProps = ReactClockProps;
-export const Clock = ({ value, ...props }: ClockProps) => {
+export type ClockProps = {
+  interval: number;
+};
+export const Clock = ({ interval }: ClockProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-8">
-      <ReactClock
-        renderSecondHand={false}
-        value={value}
-        minuteHandLength={80}
-        minuteHandOppositeLength={10}
-        hourHandLength={55}
-        hourHandOppositeLength={10}
-        hourHandWidth={6}
-        size={400}
-        {...props}
-      />
       <ReactLiveClock
-        interval={60000}
-        className="text-5xl"
-        format={'HH:mm'}
+        interval={interval}
+        className="text-6xl"
+        format={'HH:mm\0dddd'}
         ticking={true}
-        blinking={'all'}
+        locale="es"
         timezone={'Europe/Warsaw'}
+        // @ts-expect-error filter has wrong typings, but works properly according to docs
+        filter={(date: string) => {
+          const [time, weekday] = date.split('\0');
+          return (
+            <div>
+              <div>
+                {time.split(':').map((timeChunk, idx) => (
+                  <span key={idx}>
+                    {idx !== 0 && <span className="animate-pulse-time">:</span>}
+                    {timeChunk}
+                  </span>
+                ))}
+              </div>
+              <div>{weekday}</div>
+            </div>
+          );
+        }}
       />
     </div>
   );
