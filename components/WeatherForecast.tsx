@@ -122,8 +122,8 @@ export const WeatherForecast = () => {
         setThreeHourWeatherForecastData(data);
       });
     },
-    // refetch every 30 minutes
-    1000 * 60 * 30
+    // refetch every 5 minutes
+    1000 * 60 * 5
   );
 
   const [currentWeatherData, setCurrentWeatherData] =
@@ -135,8 +135,8 @@ export const WeatherForecast = () => {
         setCurrentWeatherData(data);
       });
     },
-    // refetch every 30 minutes
-    1000 * 60 * 30
+    // refetch every 5 minutes
+    1000 * 60 * 5
   );
 
   if (!threeHourWeatherForecastData && !currentWeatherData) return <></>;
