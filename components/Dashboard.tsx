@@ -23,21 +23,23 @@ export const Dashboard = () => {
 
   if (!loaded) return <></>;
   return (
-    <div className="flex flex-wrap gap-2 m-2 w-full h-full place-items-start">
-      {[
-        <Clock key={'clock'} interval={interval_ms} />,
-        <Calendar
-          key={'calendar'}
-          fixedWeeks
-          showOutsideDays
-          selected={date}
-        />,
-        <WeatherForecast key={'weather_forecast'} />
-      ].map((e) => (
-        <Card key={e.key}>
-          <CardContent>{e}</CardContent>
-        </Card>
-      ))}
+    <div className="flex flex-col gap-2 w-full h-full justify-between place-items-center">
+      <Card>
+        <CardContent>
+          <Clock key={'clock'} interval={interval_ms} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent>
+          <Calendar
+            key={'calendar'}
+            fixedWeeks
+            showOutsideDays
+            selected={date}
+          />
+        </CardContent>
+      </Card>
+      <WeatherForecast key={'weather_forecast'} />
     </div>
   );
 };
