@@ -19,6 +19,8 @@ import {
   LucideIcon,
   Snowflake,
   Sun,
+  Sunrise,
+  Sunset,
   Umbrella
 } from 'lucide-react';
 
@@ -140,7 +142,8 @@ export const WeatherForecast = () => {
   );
 
   if (!threeHourWeatherForecastData && !currentWeatherData) return <></>;
-  const Icon = iconMap[currentWeatherData?.weather.at(0)?.icon as IconSymbol];
+  const CurrentWeatherIcon =
+    iconMap[currentWeatherData?.weather.at(0)?.icon as IconSymbol];
 
   return (
     <Card className="p-1.5 w-full">
@@ -161,10 +164,10 @@ export const WeatherForecast = () => {
             </div>
             <div className="flex flex-row justify-between">
               <p className="flex gap-2 self-start items-center">
-                <Icon size={'1em'} className="align-middle" />
+                <CurrentWeatherIcon size={'1em'} className="align-middle" />
                 <span>{currentWeatherData.weather.at(0)?.description}</span>
               </p>
-              <div className="-mb-6">
+              <div className="-mb-6 flex flex-col items-end">
                 <p className="flex gap-2 items-center">
                   <span>
                     wschód{' '}
@@ -174,7 +177,7 @@ export const WeatherForecast = () => {
                       { locale: pl }
                     )}
                   </span>
-                  <Icon size={'1em'} className="align-middle" />
+                  <Sunrise size={'1em'} className="align-middle" />
                 </p>
                 <p className="flex gap-2 items-center">
                   <span>
@@ -185,7 +188,7 @@ export const WeatherForecast = () => {
                       { locale: pl }
                     )}
                   </span>
-                  <Icon size={'1em'} className="align-middle" />
+                  <Sunset size={'1em'} className="align-middle" />
                 </p>
               </div>
             </div>
