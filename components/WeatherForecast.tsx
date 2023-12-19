@@ -4,6 +4,7 @@ import {
   LabelList,
   Line,
   LineChart,
+  ReferenceArea,
   ResponsiveContainer,
   XAxis,
   YAxis
@@ -35,18 +36,19 @@ import { CurrentWeatherResponse } from '@/types/currentWeather';
 
 const ResponsiveContainerSharedProps = {
   width: '100%',
-  height: 200
+  height: 175
 };
 const LineChartSharedProps = {
   margin: { top: 0, right: 50, bottom: 0, left: 30 }
 };
 const CartesianGridSharedProps = {
   strokeDasharray: '3 3',
-  strokeOpacity: 0.3
+  strokeOpacity: 0.3,
+  horizontal: false
 };
 const YAxisSharedProps = {
   hide: true,
-  padding: { top: 0, bottom: 5 }
+  padding: { top: 24, bottom: 0 }
 };
 const type = 'monotone' as const;
 const LineSharedProps = {
@@ -141,6 +143,31 @@ export const WeatherForecast = () => {
     1000 * 60 * 5
   );
 
+  const getLastUniqueIndices = (arr: string[]): number[] => {
+    const uniqueIndices: number[] = [];
+    const lastIndexMap: { [key: string]: number } = {};
+
+    for (let i = 0; i < arr.length; i++) {
+      lastIndexMap[arr[i]] = i;
+    }
+
+    for (let i = 0; i < arr.length; i++) {
+      if (lastIndexMap[arr[i]] === i) {
+        uniqueIndices.push(i);
+      }
+    }
+
+    return uniqueIndices;
+  };
+
+  const fiveDayWeatherDataDayBreakpoints = getLastUniqueIndices(
+    threeHourWeatherForecastData?.list.map((e) =>
+      format(new Date(e.dt * 1000), 'dd', {
+        locale: pl
+      })
+    ) ?? []
+  );
+
   if (!threeHourWeatherForecastData && !currentWeatherData) return <></>;
   const CurrentWeatherIcon =
     iconMap[currentWeatherData?.weather.at(0)?.icon as IconSymbol];
@@ -152,8 +179,14 @@ export const WeatherForecast = () => {
           <>
             <div className="flex flex-row justify-between">
               <h3>
-                {round(currentWeatherData.main.temp, 1)}°C (odczuwalna{' '}
-                {round(currentWeatherData.main.feels_like, 1)}°C)
+                {round(currentWeatherData.main.temp, 1)
+                  .toString()
+                  .replaceAll('.', ',')}
+                °C (odczuwalna{' '}
+                {round(currentWeatherData.main.feels_like, 1)
+                  .toString()
+                  .replaceAll('.', ',')}
+                °C)
               </h3>
               <CardDescription>
                 Aktualizacja{' '}
@@ -205,6 +238,22 @@ export const WeatherForecast = () => {
                 data={threeHourWeatherForecastData.list}
                 {...LineChartSharedProps}>
                 <CartesianGrid {...CartesianGridSharedProps} />
+                <ReferenceArea
+                  x1={0}
+                  x2={fiveDayWeatherDataDayBreakpoints[0]}
+                  y1={0}
+                  y2={99}
+                  ifOverflow={'visible'}
+                  fill="hsl(var(--zinc-700) / 50%)"
+                />
+                <ReferenceArea
+                  x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
+                  x2={fiveDayWeatherDataDayBreakpoints[2]}
+                  y1={0}
+                  y2={99}
+                  ifOverflow={'visible'}
+                  fill="hsl(var(--zinc-700) / 50%)"
+                />
 
                 <YAxis {...YAxisSharedProps} />
                 <Line
@@ -257,28 +306,64 @@ export const WeatherForecast = () => {
                 {...LineChartSharedProps}
                 margin={{ ...LineChartSharedProps.margin, bottom: 110 }}>
                 <CartesianGrid {...CartesianGridSharedProps} />
+                <ReferenceArea
+                  x1={0}
+                  x2={fiveDayWeatherDataDayBreakpoints[0]}
+                  y1={0}
+                  y2={99}
+                  ifOverflow={'visible'}
+                  xAxisId={'id'}
+                  fill="hsl(var(--zinc-700) / 50%)"
+                />
+                <ReferenceArea
+                  x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
+                  x2={fiveDayWeatherDataDayBreakpoints[2]}
+                  y1={0}
+                  y2={99}
+                  xAxisId={'id'}
+                  ifOverflow={'visible'}
+                  fill="hsl(var(--zinc-700) / 50%)"
+                />
+
                 <YAxis {...YAxisSharedProps} />
-                <XAxis dataKey={'dt'} angle={70} textAnchor={'start'} />
+                <XAxis
+                  xAxisId={'date'}
+                  id={'0'}
+                  dataKey={'dt'}
+                  angle={70}
+                  textAnchor={'start'}
+                />
+                <XAxis xAxisId={'id'} hide />
                 <Line
                   {...LineSharedProps}
+                  xAxisId={'date'}
                   dataKey="rain.3h"
                   stroke="hsl(var(--blue-400) / 75%)">
                   <LabelList
                     {...LabelListSharedProps}
                     dataKey="rain.3h"
                     fill="hsl(var(--blue-300))"
-                    formatter={(value: number) => (value === 0 ? '' : value)}
+                    formatter={(value: number) =>
+                      (value === 0 ? '' : round(value, 1))
+                        .toString()
+                        .replaceAll('.', ',')
+                    }
                   />
                 </Line>
                 <Line
                   {...LineSharedProps}
+                  xAxisId={'date'}
                   dataKey="snow.3h"
                   stroke="hsl(var(--gray-300) / 75%)">
                   <LabelList
                     {...LabelListSharedProps}
                     dataKey="snow.3h"
                     fill="hsl(var(--gray-200))"
-                    formatter={(value: number) => (value === 0 ? '' : value)}
+                    formatter={(value: number) =>
+                      (value === 0 ? '' : round(value, 1))
+                        .toString()
+                        .replaceAll('.', ',')
+                    }
                   />
                 </Line>
               </LineChart>
