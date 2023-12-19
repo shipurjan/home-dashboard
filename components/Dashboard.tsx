@@ -11,7 +11,7 @@ import { useLoaded } from '@/lib/hooks/useLoaded';
 export const Dashboard = () => {
   const loaded = useLoaded();
   const [date, setDate] = useState(new Date());
-  const interval_ms = 60 * 1000;
+  const interval_ms = 15 * 1000;
 
   useEffect(() => {
     const timeout = setInterval(() => setDate(new Date()), interval_ms);

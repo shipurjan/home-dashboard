@@ -15,7 +15,7 @@ export const Clock = ({ interval, className, ...props }: ClockProps) => {
         className=""
         format={'HH:mm\0dddd'}
         ticking={true}
-        locale="es"
+        locale="pl"
         timezone={'Europe/Warsaw'}
         // @ts-expect-error filter has wrong typings, but works properly according to docs
         filter={(date: string) => {
