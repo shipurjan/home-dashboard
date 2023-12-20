@@ -22,7 +22,9 @@ import {
   Sun,
   Sunrise,
   Sunset,
-  Umbrella
+  Umbrella,
+  Waves,
+  Wind
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription } from './ui/card';
@@ -44,7 +46,8 @@ const LineChartSharedProps = {
 const CartesianGridSharedProps = {
   strokeDasharray: '3 3',
   strokeOpacity: 0.3,
-  horizontal: false
+  horizontal: false,
+  fill: 'hsl(var(--zinc-900) / 60%)'
 };
 const YAxisSharedProps = {
   hide: true,
@@ -195,12 +198,34 @@ export const WeatherForecast = () => {
                 })}
               </CardDescription>
             </div>
-            <div className="flex flex-row justify-between">
-              <p className="flex gap-2 self-start items-center">
-                <CurrentWeatherIcon size={'1em'} className="align-middle" />
-                <span>{currentWeatherData.weather.at(0)?.description}</span>
-              </p>
-              <div className="-mb-6 flex flex-col items-end">
+            <div className="flex flex-row justify-between text-sm mb-1.5 [&>div>p]:leading-tight">
+              <div className="flex flex-col">
+                <p className="flex gap-2 self-start items-center">
+                  <CurrentWeatherIcon size={'1em'} className="align-middle" />
+                  <span>{currentWeatherData.weather.at(0)?.description}</span>
+                </p>
+                <p className="flex gap-2 self-start items-center">
+                  <Wind size={'1em'} className="align-middle" />
+                  <span>
+                    prędkość wiatru{' '}
+                    {round(currentWeatherData.wind.speed, 1)
+                      .toString()
+                      .replaceAll('.', ',')}{' '}
+                    m/s
+                  </span>
+                </p>
+                <p className="flex gap-2 self-start items-center">
+                  <Waves size={'1em'} className="align-middle" />
+                  <span>
+                    widoczność{' '}
+                    {round(currentWeatherData.visibility / 1000, 1)
+                      .toString()
+                      .replaceAll('.', ',')}{' '}
+                    km
+                  </span>
+                </p>
+              </div>
+              <div className="flex flex-col items-end">
                 <p className="flex gap-2 items-center">
                   <span>
                     wschód{' '}
@@ -237,14 +262,13 @@ export const WeatherForecast = () => {
               <LineChart
                 data={threeHourWeatherForecastData.list}
                 {...LineChartSharedProps}>
-                <CartesianGrid {...CartesianGridSharedProps} />
                 <ReferenceArea
                   x1={0}
-                  x2={fiveDayWeatherDataDayBreakpoints[0]}
+                  x2={fiveDayWeatherDataDayBreakpoints[0] + 1}
                   y1={0}
                   y2={99}
                   ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-700) / 50%)"
+                  fill="hsl(var(--zinc-950) / 100%)"
                 />
                 <ReferenceArea
                   x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
@@ -252,8 +276,9 @@ export const WeatherForecast = () => {
                   y1={0}
                   y2={99}
                   ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-700) / 50%)"
+                  fill="hsl(var(--zinc-950) / 100%)"
                 />
+                <CartesianGrid {...CartesianGridSharedProps} />
 
                 <YAxis {...YAxisSharedProps} />
                 <Line
@@ -305,15 +330,14 @@ export const WeatherForecast = () => {
                 }))}
                 {...LineChartSharedProps}
                 margin={{ ...LineChartSharedProps.margin, bottom: 110 }}>
-                <CartesianGrid {...CartesianGridSharedProps} />
                 <ReferenceArea
                   x1={0}
-                  x2={fiveDayWeatherDataDayBreakpoints[0]}
+                  x2={fiveDayWeatherDataDayBreakpoints[0] + 1}
                   y1={0}
                   y2={99}
                   ifOverflow={'visible'}
                   xAxisId={'id'}
-                  fill="hsl(var(--zinc-700) / 50%)"
+                  fill="hsl(var(--zinc-950) / 100%)"
                 />
                 <ReferenceArea
                   x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
@@ -322,8 +346,9 @@ export const WeatherForecast = () => {
                   y2={99}
                   xAxisId={'id'}
                   ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-700) / 50%)"
+                  fill="hsl(var(--zinc-950) / 100%)"
                 />
+                <CartesianGrid {...CartesianGridSharedProps} />
 
                 <YAxis {...YAxisSharedProps} />
                 <XAxis
