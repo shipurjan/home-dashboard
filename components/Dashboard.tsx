@@ -32,6 +32,8 @@ export const Dashboard = () => {
       <Card>
         <CardContent>
           <Calendar
+            mode="single"
+            month={date}
             key={'calendar'}
             fixedWeeks
             showOutsideDays

@@ -51,7 +51,7 @@ const CartesianGridSharedProps = {
 };
 const YAxisSharedProps = {
   hide: true,
-  padding: { top: 24, bottom: 0 }
+  padding: { top: 32, bottom: 0 }
 };
 const type = 'monotone' as const;
 const LineSharedProps = {
@@ -125,7 +125,6 @@ export const WeatherForecast = () => {
   useDispatch(
     () => {
       fetchData('/api/weather/threeHourWeatherForecast').then((data) => {
-        console.log(data);
         setThreeHourWeatherForecastData(data);
       });
     },
@@ -138,7 +137,6 @@ export const WeatherForecast = () => {
   useDispatch(
     () => {
       fetchData('/api/weather/currentWeather').then((data) => {
-        console.log(data);
         setCurrentWeatherData(data);
       });
     },
@@ -171,9 +169,21 @@ export const WeatherForecast = () => {
     ) ?? []
   );
 
-  if (!threeHourWeatherForecastData && !currentWeatherData) return <></>;
+  if (!threeHourWeatherForecastData || !currentWeatherData) return <></>;
+
   const CurrentWeatherIcon =
     iconMap[currentWeatherData?.weather.at(0)?.icon as IconSymbol];
+
+  const dzisX =
+    50 *
+    (fiveDayWeatherDataDayBreakpoints[0] /
+      (threeHourWeatherForecastData.list.length - 1));
+
+  const jutroX =
+    50 *
+    ((fiveDayWeatherDataDayBreakpoints[0] +
+      fiveDayWeatherDataDayBreakpoints[1]) /
+      (threeHourWeatherForecastData.list.length - 1));
 
   return (
     <Card className="p-1.5 w-full">
@@ -191,8 +201,8 @@ export const WeatherForecast = () => {
                   .replaceAll('.', ',')}
                 °C)
               </h3>
-              <CardDescription>
-                Aktualizacja{' '}
+              <CardDescription className=" opacity-30">
+                Ostatnia aktualizacja o{' '}
                 {format(new Date(currentWeatherData.dt * 1000), 'HH:mm', {
                   locale: pl
                 })}
@@ -330,6 +340,30 @@ export const WeatherForecast = () => {
                 }))}
                 {...LineChartSharedProps}
                 margin={{ ...LineChartSharedProps.margin, bottom: 110 }}>
+                <text
+                  x={`${dzisX}%`}
+                  y="25%"
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fill: 'hsl(var(--foreground))',
+                    opacity: 0
+                  }}
+                  textAnchor="start">
+                  dziś
+                </text>
+                <text
+                  x={`${jutroX}%`}
+                  y="25%"
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fill: 'hsl(var(--foreground))',
+                    opacity: 0
+                  }}
+                  textAnchor="start">
+                  jutro
+                </text>
                 <ReferenceArea
                   x1={0}
                   x2={fiveDayWeatherDataDayBreakpoints[0] + 1}

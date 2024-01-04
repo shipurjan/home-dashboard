@@ -19,6 +19,7 @@ function Calendar({
 }: CalendarProps) {
   return (
     <DayPicker
+      disableNavigation
       locale={pl}
       showOutsideDays={showOutsideDays}
       className={cn('', className)}
