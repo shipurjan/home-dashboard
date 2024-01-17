@@ -4,7 +4,7 @@ import {
   LabelList,
   Line,
   LineChart,
-  ReferenceArea,
+  ReferenceLine,
   ResponsiveContainer,
   XAxis,
   YAxis
@@ -31,7 +31,10 @@ import { Card, CardContent, CardDescription } from './ui/card';
 import { round } from '@/lib/utils';
 import { format } from 'date-fns';
 import pl from 'date-fns/locale/pl';
-import { ThreeHourWeatherForecastResponse } from '@/types/threeHourWeatherForecast';
+import {
+  ThreeHourWeatherForecastEntry,
+  ThreeHourWeatherForecastResponse
+} from '@/types/threeHourWeatherForecast';
 import { useDispatch } from '@/lib/hooks/useDispatch';
 import { useState } from 'react';
 import { CurrentWeatherResponse } from '@/types/currentWeather';
@@ -174,16 +177,45 @@ export const WeatherForecast = () => {
   const CurrentWeatherIcon =
     iconMap[currentWeatherData?.weather.at(0)?.icon as IconSymbol];
 
-  const dzisX =
+  const todayLabelX =
     50 *
-    (fiveDayWeatherDataDayBreakpoints[0] /
-      (threeHourWeatherForecastData.list.length - 1));
+      (fiveDayWeatherDataDayBreakpoints[0] /
+        (threeHourWeatherForecastData.list.length - 1)) -
+    4;
 
-  const jutroX =
+  const tomorrowLabelX =
     50 *
-    ((fiveDayWeatherDataDayBreakpoints[0] +
-      fiveDayWeatherDataDayBreakpoints[1]) /
-      (threeHourWeatherForecastData.list.length - 1));
+      ((fiveDayWeatherDataDayBreakpoints[0] +
+        fiveDayWeatherDataDayBreakpoints[1]) /
+        (threeHourWeatherForecastData.list.length - 1)) -
+    1;
+
+  const todayFirstDay = threeHourWeatherForecastData.list.at(0);
+
+  const tomorrowFirstDay = threeHourWeatherForecastData.list.at(
+    fiveDayWeatherDataDayBreakpoints[0] + 1
+  );
+
+  const dateDifference = (
+    dateEntry: ThreeHourWeatherForecastEntry | undefined
+  ) => {
+    const today = Number(
+      format(new Date(), 'dd', {
+        locale: pl
+      })
+    );
+    const entryDay = Number(
+      format((dateEntry?.dt ?? 0) * 1000, 'dd', {
+        locale: pl
+      })
+    );
+
+    return entryDay - today;
+  };
+
+  const visibility = currentWeatherData.visibility;
+  const currentWeather = round(currentWeatherData.main.temp);
+  const feelsLike = round(currentWeatherData.main.feels_like);
 
   return (
     <Card className="p-1.5 w-full">
@@ -191,16 +223,18 @@ export const WeatherForecast = () => {
         {currentWeatherData && (
           <>
             <div className="flex flex-row justify-between">
-              <h3>
-                {round(currentWeatherData.main.temp, 1)
-                  .toString()
-                  .replaceAll('.', ',')}
-                °C (odczuwalna{' '}
-                {round(currentWeatherData.main.feels_like, 1)
-                  .toString()
-                  .replaceAll('.', ',')}
-                °C)
-              </h3>
+              <div className="flex flex-row justify-center items-center gap-2">
+                <h3>
+                  Teraz {currentWeather.toString().replaceAll('.', ',')}
+                  °C{' '}
+                </h3>
+                {currentWeather !== feelsLike && (
+                  <h5>
+                    odczuwalna {feelsLike.toString().replaceAll('.', ',')}
+                    °C
+                  </h5>
+                )}
+              </div>
               <CardDescription className=" opacity-30">
                 Ostatnia aktualizacja o{' '}
                 {format(new Date(currentWeatherData.dt * 1000), 'HH:mm', {
@@ -228,10 +262,13 @@ export const WeatherForecast = () => {
                   <Waves size={'1em'} className="align-middle" />
                   <span>
                     widoczność{' '}
-                    {round(currentWeatherData.visibility / 1000, 1)
+                    {(visibility > 549
+                      ? round(visibility / 1000, 1)
+                      : round(visibility)
+                    )
                       .toString()
                       .replaceAll('.', ',')}{' '}
-                    km
+                    {visibility > 549 ? 'km' : 'm'}
                   </span>
                 </p>
               </div>
@@ -270,25 +307,63 @@ export const WeatherForecast = () => {
           <CardContent className="p-0 mt-1">
             <ResponsiveContainer {...ResponsiveContainerSharedProps}>
               <LineChart
-                data={threeHourWeatherForecastData.list}
+                data={threeHourWeatherForecastData.list.map((e) => ({
+                  ...e,
+                  dt: format(new Date(e.dt * 1000), 'H', {
+                    locale: pl
+                  })
+                }))}
                 {...LineChartSharedProps}>
-                <ReferenceArea
-                  x1={0}
-                  x2={fiveDayWeatherDataDayBreakpoints[0] + 1}
-                  y1={0}
-                  y2={99}
-                  ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-950) / 100%)"
-                />
-                <ReferenceArea
-                  x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
-                  x2={fiveDayWeatherDataDayBreakpoints[2]}
-                  y1={0}
-                  y2={99}
-                  ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-950) / 100%)"
-                />
+                <text
+                  x={`${todayLabelX}%`}
+                  y="23%"
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fill: 'hsl(var(--foreground))',
+                    opacity: 0.3
+                  }}
+                  textAnchor="start">
+                  {dateDifference(todayFirstDay) === 0
+                    ? 'dzisiaj'
+                    : dateDifference(todayFirstDay) === 1
+                      ? 'jutro'
+                      : format(new Date((todayFirstDay?.dt ?? 0) * 1000), 'dd')}
+                </text>
+                <text
+                  x={`${tomorrowLabelX}%`}
+                  y="23%"
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fill: 'hsl(var(--foreground))',
+                    opacity: 0.3
+                  }}
+                  textAnchor="start">
+                  {dateDifference(tomorrowFirstDay) === 1
+                    ? 'jutro'
+                    : dateDifference(tomorrowFirstDay) === 2
+                      ? 'pojutrze'
+                      : format(
+                          new Date((tomorrowFirstDay?.dt ?? 0) * 1000),
+                          'dd'
+                        )}
+                </text>
+
                 <CartesianGrid {...CartesianGridSharedProps} />
+
+                <ReferenceLine
+                  x={fiveDayWeatherDataDayBreakpoints[0] + 1}
+                  stroke="white"
+                  strokeWidth={2}
+                  opacity={0.2}
+                />
+                <ReferenceLine
+                  x={fiveDayWeatherDataDayBreakpoints[1] + 1}
+                  stroke="white"
+                  strokeWidth={2}
+                  opacity={0.2}
+                />
 
                 <YAxis {...YAxisSharedProps} />
                 <Line
@@ -326,71 +401,46 @@ export const WeatherForecast = () => {
             Śnieg i deszcz [mm]
           </CardDescription>
           <CardContent className="p-0 mt-1">
-            <ResponsiveContainer
-              {...ResponsiveContainerSharedProps}
-              height={ResponsiveContainerSharedProps.height + 110}>
+            <ResponsiveContainer {...ResponsiveContainerSharedProps}>
               <LineChart
                 data={threeHourWeatherForecastData.list.map((e) => ({
                   ...e,
                   rain: e.rain || { '3h': 0 },
                   snow: e.snow || { '3h': 0 },
-                  dt: format(new Date(e.dt * 1000), 'dd HH:mm', {
+                  dt: format(new Date(e.dt * 1000), 'H', {
                     locale: pl
                   })
                 }))}
                 {...LineChartSharedProps}
-                margin={{ ...LineChartSharedProps.margin, bottom: 110 }}>
-                <text
-                  x={`${dzisX}%`}
-                  y="25%"
-                  style={{
-                    fontSize: 48,
-                    fontWeight: 'bold',
-                    fill: 'hsl(var(--foreground))',
-                    opacity: 0
-                  }}
-                  textAnchor="start">
-                  dziś
-                </text>
-                <text
-                  x={`${jutroX}%`}
-                  y="25%"
-                  style={{
-                    fontSize: 48,
-                    fontWeight: 'bold',
-                    fill: 'hsl(var(--foreground))',
-                    opacity: 0
-                  }}
-                  textAnchor="start">
-                  jutro
-                </text>
-                <ReferenceArea
-                  x1={0}
-                  x2={fiveDayWeatherDataDayBreakpoints[0] + 1}
-                  y1={0}
-                  y2={99}
-                  ifOverflow={'visible'}
-                  xAxisId={'id'}
-                  fill="hsl(var(--zinc-950) / 100%)"
-                />
-                <ReferenceArea
-                  x1={fiveDayWeatherDataDayBreakpoints[1] + 1}
-                  x2={fiveDayWeatherDataDayBreakpoints[2]}
-                  y1={0}
-                  y2={99}
-                  xAxisId={'id'}
-                  ifOverflow={'visible'}
-                  fill="hsl(var(--zinc-950) / 100%)"
-                />
+                margin={{ ...LineChartSharedProps.margin, bottom: 3 }}>
                 <CartesianGrid {...CartesianGridSharedProps} />
+
+                <ReferenceLine
+                  x={fiveDayWeatherDataDayBreakpoints[0] + 1}
+                  xAxisId={'id'}
+                  stroke="white"
+                  strokeWidth={2}
+                  opacity={0.2}
+                />
+                <ReferenceLine
+                  x={fiveDayWeatherDataDayBreakpoints[1] + 1}
+                  xAxisId={'id'}
+                  stroke="white"
+                  strokeWidth={2}
+                  opacity={0.2}
+                />
 
                 <YAxis {...YAxisSharedProps} />
                 <XAxis
+                  style={{
+                    fill: 'white',
+                    opacity: 0.68
+                  }}
                   xAxisId={'date'}
                   id={'0'}
                   dataKey={'dt'}
-                  angle={70}
-                  textAnchor={'start'}
+                  angle={0}
+                  textAnchor={'middle'}
                 />
                 <XAxis xAxisId={'id'} hide />
                 <Line
