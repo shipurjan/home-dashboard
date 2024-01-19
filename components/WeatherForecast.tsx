@@ -179,21 +179,29 @@ export const WeatherForecast = () => {
 
   const todayLabelX =
     50 *
-      (fiveDayWeatherDataDayBreakpoints[0] /
-        (threeHourWeatherForecastData.list.length - 1)) -
-    4;
+    (fiveDayWeatherDataDayBreakpoints[0] /
+      (threeHourWeatherForecastData.list.length - 1));
 
   const tomorrowLabelX =
     50 *
-      ((fiveDayWeatherDataDayBreakpoints[0] +
-        fiveDayWeatherDataDayBreakpoints[1]) /
-        (threeHourWeatherForecastData.list.length - 1)) -
-    1;
+    ((fiveDayWeatherDataDayBreakpoints[0] +
+      fiveDayWeatherDataDayBreakpoints[1]) /
+      (threeHourWeatherForecastData.list.length - 1));
+
+  const overmorrowLabelX =
+    50 *
+    ((fiveDayWeatherDataDayBreakpoints[1] +
+      fiveDayWeatherDataDayBreakpoints[2]) /
+      (threeHourWeatherForecastData.list.length - 1));
 
   const todayFirstDay = threeHourWeatherForecastData.list.at(0);
 
   const tomorrowFirstDay = threeHourWeatherForecastData.list.at(
     fiveDayWeatherDataDayBreakpoints[0] + 1
+  );
+
+  const overmorrowFirstDay = threeHourWeatherForecastData.list.at(
+    fiveDayWeatherDataDayBreakpoints[1] + 1
   );
 
   const dateDifference = (
@@ -325,7 +333,9 @@ export const WeatherForecast = () => {
                   }}
                   textAnchor="start">
                   {dateDifference(todayFirstDay) === 0
-                    ? 'dzisiaj'
+                    ? fiveDayWeatherDataDayBreakpoints[1] > 9
+                      ? 'dzisiaj'
+                      : ''
                     : dateDifference(todayFirstDay) === 1
                       ? 'jutro'
                       : format(new Date((todayFirstDay?.dt ?? 0) * 1000), 'dd')}
@@ -346,6 +356,25 @@ export const WeatherForecast = () => {
                       ? 'pojutrze'
                       : format(
                           new Date((tomorrowFirstDay?.dt ?? 0) * 1000),
+                          'dd'
+                        )}
+                </text>
+                <text
+                  x={`${overmorrowLabelX}%`}
+                  y="23%"
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fill: 'hsl(var(--foreground))',
+                    opacity: 0.3
+                  }}
+                  textAnchor="start">
+                  {dateDifference(overmorrowFirstDay) === 2
+                    ? 'pojutrze'
+                    : dateDifference(overmorrowFirstDay) === 3
+                      ? 'za 3 dni'
+                      : format(
+                          new Date((overmorrowFirstDay?.dt ?? 0) * 1000),
                           'dd'
                         )}
                 </text>
@@ -407,7 +436,7 @@ export const WeatherForecast = () => {
                   ...e,
                   rain: e.rain || { '3h': 0 },
                   snow: e.snow || { '3h': 0 },
-                  dt: format(new Date(e.dt * 1000), 'H', {
+                  dt: format(new Date(e.dt * 1000 - 3600), 'H', {
                     locale: pl
                   })
                 }))}
