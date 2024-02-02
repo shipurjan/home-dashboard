@@ -7,6 +7,7 @@ import 'moment/locale/pl';
 import { Card, CardContent } from '@/components/ui/card';
 import { WeatherForecast } from './WeatherForecast';
 import { useLoaded } from '@/lib/hooks/useLoaded';
+import { BusTimetable } from './BusTimetable';
 
 export const Dashboard = () => {
   const loaded = useLoaded();
@@ -39,6 +40,11 @@ export const Dashboard = () => {
             showOutsideDays
             selected={date}
           />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent>
+          <BusTimetable />
         </CardContent>
       </Card>
       <WeatherForecast key={'weather_forecast'} />

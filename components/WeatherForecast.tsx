@@ -31,13 +31,13 @@ import { Card, CardContent, CardDescription } from './ui/card';
 import { round } from '@/lib/utils';
 import { format } from 'date-fns';
 import pl from 'date-fns/locale/pl';
+import { useDispatch } from '@/lib/hooks/useDispatch';
+import { useState } from 'react';
 import {
   ThreeHourWeatherForecastEntry,
   ThreeHourWeatherForecastResponse
-} from '@/types/threeHourWeatherForecast';
-import { useDispatch } from '@/lib/hooks/useDispatch';
-import { useState } from 'react';
-import { CurrentWeatherResponse } from '@/types/currentWeather';
+} from '@/app/api/weather/threeHourWeatherForecast/route';
+import { CurrentWeatherResponse } from '@/app/api/weather/currentWeather/route';
 
 const ResponsiveContainerSharedProps = {
   width: '100%',
