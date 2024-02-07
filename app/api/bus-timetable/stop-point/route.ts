@@ -1,6 +1,6 @@
+import { getStopPointName } from '@/lib/utils';
 import { format } from 'date-fns';
 import pl from 'date-fns/locale/pl';
-import { getStopPointName } from '../bus-list/route';
 
 export type Departure = {
   courseId: number;

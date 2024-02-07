@@ -1,4 +1,4 @@
-import { distance, round } from '@/lib/utils';
+import { distance, getStopPointName, round } from '@/lib/utils';
 import { format } from 'date-fns';
 import pl from 'date-fns/locale/pl';
 
@@ -26,29 +26,6 @@ export type BusList = {
   vehicles: Vehicle[];
   offline: boolean;
 };
-
-export function getStopPointName(symbol: string | null) {
-  switch (symbol) {
-    case '2375':
-      return 'Silesia';
-    case '2376':
-      return 'Górnicza Węglowa Urząd Skarbowy';
-    case '2373':
-      return 'Węglowa Kościół św. Barbary';
-    case '2371':
-      return 'Wyspiańskiego os. Północ';
-    case '2368':
-    case '2369':
-      return 'Traugutta ZSTiL';
-    case '2366':
-    case '2367':
-      return 'Dworzec';
-    case '2365':
-      return 'Skwer Stulecia';
-    default:
-      return '-';
-  }
-}
 
 const getFilteredResponse = (busTimetable: BusList) => ({
   ...busTimetable,
