@@ -33,7 +33,7 @@ const getFilteredResponse = (busTimetable: BusList) => ({
     .filter(
       (vehicle) =>
         vehicle.lineName === '50' &&
-        // vehicle.optionalDirection === 'Os. Karpackie'
+        vehicle.optionalDirection === 'Os. Karpackie' &&
         Number(vehicle.nearestSymbol) >= 2365
     )
     .map((vehicle) => ({
