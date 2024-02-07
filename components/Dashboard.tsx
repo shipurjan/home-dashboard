@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
 import { Clock } from './Clock';
 import 'moment/locale/pl';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,7 +11,7 @@ import { BusTimetable } from './BusTimetable';
 export const Dashboard = () => {
   const loaded = useLoaded();
   const [date, setDate] = useState(new Date());
-  const interval_ms = 15 * 1000;
+  const interval_ms = 1 * 1000;
 
   useEffect(() => {
     const timeout = setInterval(() => setDate(new Date()), interval_ms);
@@ -27,10 +26,10 @@ export const Dashboard = () => {
     <div className="flex flex-col gap-2 w-full h-full justify-between place-items-center">
       <Card>
         <CardContent>
-          <Clock key={'clock'} interval={interval_ms} />
+          <Clock key={'clock'} interval={interval_ms} date={date} />
         </CardContent>
       </Card>
-      <Card>
+      {/* <Card>
         <CardContent>
           <Calendar
             mode="single"
@@ -41,7 +40,7 @@ export const Dashboard = () => {
             selected={date}
           />
         </CardContent>
-      </Card>
+      </Card> */}
       <Card>
         <CardContent>
           <BusTimetable />

@@ -1,3 +1,7 @@
+import { format } from 'date-fns';
+import pl from 'date-fns/locale/pl';
+import { getStopPointName } from '../bus-list/route';
+
 export type Departure = {
   courseId: number;
   scheduledDepartureSec: number;
@@ -22,6 +26,25 @@ export type StopPoint = {
   error: unknown;
 };
 
+const getFilteredResponse = (stopPoint: StopPoint) => ({
+  ...stopPoint,
+  stopPointName: getStopPointName(stopPoint.stopPointSymbol),
+  responseDate: format(stopPoint.responseDate, 'HH:mm:ss', {
+    locale: pl
+  }),
+  departures: stopPoint.departures.map((departure) => ({
+    ...departure,
+    scheduledDeparture: format(departure.scheduledDeparture, 'HH:mm', {
+      locale: pl
+    }),
+    realDeparture: format(departure.realDeparture, 'HH:mm', {
+      locale: pl
+    })
+  }))
+});
+
+export type StopPointResponse = ReturnType<typeof getFilteredResponse>;
+
 export const dynamic = 'force-dynamic'; // defaults to auto
 export async function GET() {
   const res = await fetch(
@@ -29,23 +52,10 @@ export async function GET() {
     {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-      // revalidate every 5 seconds
-      next: { revalidate: 15 }
+      // revalidate every minute
+      next: { revalidate: 60 }
     }
   );
   const stopPoint = (await res.json()) as StopPoint;
-  const filteredPoint = {
-    ...stopPoint,
-    responseDate: new Date(stopPoint.responseDate).toLocaleTimeString('pl-PL'),
-    departures: stopPoint.departures.map((departure) => ({
-      ...departure,
-      scheduledDeparture: new Date(
-        departure.scheduledDeparture
-      ).toLocaleTimeString('pl-PL'),
-      realDeparture: new Date(departure.realDeparture).toLocaleTimeString(
-        'pl-PL'
-      )
-    }))
-  };
-  return Response.json(filteredPoint);
+  return Response.json(getFilteredResponse(stopPoint));
 }

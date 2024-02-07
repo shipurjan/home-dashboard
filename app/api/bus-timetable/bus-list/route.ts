@@ -1,4 +1,6 @@
 import { distance, round } from '@/lib/utils';
+import { format } from 'date-fns';
+import pl from 'date-fns/locale/pl';
 
 export type Vehicle = {
   lineName: string;
@@ -15,15 +17,69 @@ export type Vehicle = {
   distanceToNearestStopPoint: number;
   nearestSymbol: string;
   operator: string;
-  onStopPoint: string;
+  onStopPoint: string | null;
   orderInCourse: number;
   optionalDirection: string;
 };
 
-export type BusTimetable = {
+export type BusList = {
   vehicles: Vehicle[];
   offline: boolean;
 };
+
+export function getStopPointName(symbol: string | null) {
+  switch (symbol) {
+    case '2375':
+      return 'Silesia';
+    case '2376':
+      return 'Górnicza Węglowa Urząd Skarbowy';
+    case '2373':
+      return 'Węglowa Kościół św. Barbary';
+    case '2371':
+      return 'Wyspiańskiego os. Północ';
+    case '2368':
+    case '2369':
+      return 'Traugutta ZSTiL';
+    case '2366':
+    case '2367':
+      return 'Dworzec';
+    case '2365':
+      return 'Skwer Stulecia';
+    default:
+      return '-';
+  }
+}
+
+const getFilteredResponse = (busTimetable: BusList) => ({
+  ...busTimetable,
+  vehicles: busTimetable.vehicles
+    .filter(
+      (vehicle) =>
+        vehicle.lineName === '50' &&
+        // vehicle.optionalDirection === 'Os. Karpackie'
+        Number(vehicle.nearestSymbol) >= 2365
+    )
+    .map((vehicle) => ({
+      ...vehicle,
+      lastPingDate: format(vehicle.lastPingDate, 'HH:mm:ss', {
+        locale: pl
+      }),
+      nearestSymbol: {
+        symbol: vehicle.nearestSymbol,
+        name: getStopPointName(vehicle.nearestSymbol)
+      },
+      onStopPoint: {
+        symbol: vehicle.onStopPoint,
+        name: getStopPointName(vehicle.onStopPoint)
+      },
+      distanceToSkwerStuleciaStopPoint:
+        round(
+          distance(49.911, 19.00582, vehicle.latitude, vehicle.longitude, 'K'),
+          3
+        ) * 1000
+    }))
+});
+export type BusListResponse = ReturnType<typeof getFilteredResponse>;
 
 export const dynamic = 'force-dynamic'; // defaults to auto
 export async function GET() {
@@ -37,56 +93,7 @@ export async function GET() {
     }
   );
 
-  const busTimetable = (await res.json()) as BusTimetable;
+  const busTimetable = (await res.json()) as BusList;
 
-  const filteredTable = {
-    ...busTimetable,
-    vehicles: busTimetable.vehicles
-      .filter(
-        (vehicle) =>
-          vehicle.lineName === '50' &&
-          // vehicle.optionalDirection === 'Os. Karpackie'
-          Number(vehicle.nearestSymbol) >= 2365
-      )
-      .map((vehicle) => ({
-        ...vehicle,
-        lastPingDate: new Date(vehicle.lastPingDate).toLocaleTimeString(
-          'pl-PL'
-        ),
-        nearestSymbolt: {
-          symbol: vehicle.nearestSymbol,
-          name: (() => {
-            switch (vehicle.nearestSymbol) {
-              case '2375':
-                return 'Cz-Dz. Silesia';
-              case '2376':
-                return 'Cz-Dz. Górnicza Węglowa Urząd Skarbowy';
-              case '2373':
-                return 'Cz-Dz. Węglowa Kościół św. Barbary';
-              case '2368':
-                return 'Cz-Dz. Traugutta ZSTiL';
-              case '2366':
-              case '2367':
-                return 'Cz-Dz. Dworzec';
-              case '2365':
-                return 'Cz-Dz. Skwer Stulecia';
-              default:
-                return '-';
-            }
-          })()
-        },
-        distanceToSkwerStuleciaStopPoint:
-          round(
-            distance(
-              49.911,
-              19.00582,
-              vehicle.latitude,
-              vehicle.longitude,
-              'K'
-            ),
-            3
-          ) * 1000
-      }))
-  };
-  return Response.json(filteredTable);
+  return Response.json(getFilteredResponse(busTimetable));
 }

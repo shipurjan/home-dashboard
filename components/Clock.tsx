@@ -3,17 +3,25 @@
 import { cn } from '@/lib/utils';
 import ReactLiveClock from 'react-live-clock';
 import { Separator } from './ui/separator';
+import { format } from 'date-fns';
+import pl from 'date-fns/locale/pl';
 
 export type ClockProps = React.HTMLAttributes<HTMLDivElement> & {
   interval: number;
+  date: Date;
 };
-export const Clock = ({ interval, className, ...props }: ClockProps) => {
+export const Clock = ({
+  interval,
+  date: currentTimestamp,
+  className,
+  ...props
+}: ClockProps) => {
   return (
     <div suppressHydrationWarning>
       <ReactLiveClock
         interval={interval}
         className=""
-        format={'HH:mm\0dddd'}
+        format={'HH:mm:ss\0dddd'}
         ticking={true}
         locale="pl"
         timezone={'Europe/Warsaw'}
@@ -36,7 +44,12 @@ export const Clock = ({ interval, className, ...props }: ClockProps) => {
                 ))}
               </h2>
               <Separator className="my-1" />
-              <h4>{weekday}</h4>
+              <h4>
+                {format(currentTimestamp, 'dd.MM.yyyy', {
+                  locale: pl
+                })}{' '}
+                {weekday}
+              </h4>
             </div>
           );
         }}

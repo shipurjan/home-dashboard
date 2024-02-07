@@ -50,7 +50,7 @@ const CartesianGridSharedProps = {
   strokeDasharray: '3 3',
   strokeOpacity: 0.3,
   horizontal: false,
-  fill: 'hsl(var(--zinc-900) / 60%)'
+  fill: 'hsl(var(--background) / 60%)'
 };
 const YAxisSharedProps = {
   hide: true,
@@ -208,17 +208,20 @@ export const WeatherForecast = () => {
     dateEntry: ThreeHourWeatherForecastEntry | undefined
   ) => {
     const today = Number(
-      format(new Date(), 'dd', {
+      format(new Date(), 'i', {
         locale: pl
       })
     );
     const entryDay = Number(
-      format((dateEntry?.dt ?? 0) * 1000, 'dd', {
+      format((dateEntry?.dt ?? 0) * 1000, 'i', {
         locale: pl
       })
     );
 
-    return entryDay - today;
+    const diff =
+      (entryDay - today < 0 ? 7 + (entryDay - today) : entryDay - today) % 7;
+
+    return diff;
   };
 
   const visibility = currentWeatherData.visibility;
@@ -237,20 +240,20 @@ export const WeatherForecast = () => {
                   °C{' '}
                 </h3>
                 {currentWeather !== feelsLike && (
-                  <h5>
+                  <h5 className="opacity-70">
                     odczuwalna {feelsLike.toString().replaceAll('.', ',')}
                     °C
                   </h5>
                 )}
               </div>
-              <CardDescription className=" opacity-30">
+              <CardDescription className="opacity-30">
                 Ostatnia aktualizacja o{' '}
                 {format(new Date(currentWeatherData.dt * 1000), 'HH:mm', {
                   locale: pl
                 })}
               </CardDescription>
             </div>
-            <div className="flex flex-row justify-between text-sm mb-1.5 [&>div>p]:leading-tight">
+            <div className="flex flex-row justify-between text-sm mb-1.5 [&>div>p]:leading-tight opacity-70">
               <div className="flex flex-col">
                 <p className="flex gap-2 self-start items-center">
                   <CurrentWeatherIcon size={'1em'} className="align-middle" />
@@ -368,9 +371,11 @@ export const WeatherForecast = () => {
                     fill: 'hsl(var(--foreground))',
                     opacity: 0.3
                   }}
-                  textAnchor="start">
+                  textAnchor="middle">
                   {dateDifference(overmorrowFirstDay) === 2
-                    ? 'pojutrze'
+                    ? fiveDayWeatherDataDayBreakpoints[2] <= 99
+                      ? 'pojutrze'
+                      : ''
                     : dateDifference(overmorrowFirstDay) === 3
                       ? 'za 3 dni'
                       : format(
@@ -402,7 +407,7 @@ export const WeatherForecast = () => {
                   <LabelList
                     {...LabelListSharedProps}
                     dataKey="main.temp"
-                    fill="hsl(var(--primary-foreground))"
+                    fill="hsl(var(--primary))"
                     formatter={(value: number) => round(value)}
                   />
                 </Line>
